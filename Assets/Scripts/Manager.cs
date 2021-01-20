@@ -7,6 +7,8 @@ using Emgu.CV;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using Emgu.CV.Util;
+using System.Drawing;
+using Color = System.Drawing.Color;
 
 public class Manager : MonoBehaviour {
 
@@ -50,6 +52,46 @@ public class Manager : MonoBehaviour {
         }
     }
 
+    private List<RotatedRect> RectangleDetection(Mat matThresolded, bool draw = true) {
+        VectorOfVectorOfPoint contours = new VectorOfVectorOfPoint();
+        Mat hierarchy = new Mat();
+        CvInvoke.FindContours(matThresolded, contours, hierarchy, RetrType.List, ChainApproxMethod.ChainApproxNone);
+
+        List<RotatedRect> boxList = new List<RotatedRect>();
+        for (int i = 0; i < contours.Size; i++) {
+            VectorOfPoint approxContour = new VectorOfPoint();
+            CvInvoke.ApproxPolyDP(contours[i], approxContour, CvInvoke.ArcLength(contours[i], true) * 0.05, true);
+
+            if (CvInvoke.ContourArea(approxContour, false) > 250) {
+                if (approxContour.Size == 4) {
+                    #region determine if all the angles in the contour are within [80, 100] degree
+                    bool isRectangle = true;
+                    Point[] pts = approxContour.ToArray();
+                    LineSegment2D[] edges = PointCollection.PolyLine(pts, true);
+
+                    for (int j = 0; j < edges.Length; j++) {
+                        double angle = Mathf.Abs((float)edges[(j + 1) % edges.Length].GetExteriorAngleDegree(edges[j]));
+                        if (angle < 80 || angle > 100) {
+                            isRectangle = false;
+                            break;
+                        }
+                    }
+
+                    #endregion
+
+                    if (isRectangle) boxList.Add(CvInvoke.MinAreaRect(approxContour));
+                }
+            }
+        }
+        if (draw) {
+            foreach (RotatedRect box in boxList) {
+                CvInvoke.Polylines(webcamFrame, System.Array.ConvertAll(box.GetVertices(), Point.Round), true,
+                    new Bgr(Color.Blue).MCvScalar, 4);
+            }
+        }
+        return boxList;
+    }
+
     private void HandleWebcamQueryFrame(object sender, System.EventArgs e) {
         if (webcam.IsOpened) {
             webcam.Retrieve(webcamFrame);
@@ -63,15 +105,7 @@ public class Manager : MonoBehaviour {
 
             CvInvoke.Threshold(matGrayscale, matThresolded, thresholdValue, 255 ,ThresholdType.Binary);
 
-
-            VectorOfVectorOfPoint contours = new VectorOfVectorOfPoint();
-            Mat hierarchy = new Mat();
-            CvInvoke.FindContours(matThresolded, contours, hierarchy, RetrType.List, ChainApproxMethod.ChainApproxNone);
-            CvInvoke.CvtColor(matThresolded, webcamFrame, ColorConversion.Gray2Bgr);
-
-            for (int i = 0; i < contours.Size; i++) {
-                CvInvoke.DrawContours(webcamFrame, contours, i, new MCvScalar(255, 0, 255), 2);
-            }
+            List<RotatedRect> boxList = RectangleDetection(matThresolded);
 
         }
         // making the thread sleep so that things are not happening too fast. might be optional.
