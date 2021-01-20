@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using Emgu.CV;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
+using Emgu.CV.Util;
 
 public class Manager : MonoBehaviour {
 
@@ -16,6 +17,8 @@ public class Manager : MonoBehaviour {
     [SerializeField]
     private RawImage rawImage;
     private Texture2D tex;
+
+    private float thresholdValue = 127;
 
     void Start() {
         if (rawImage == null)
@@ -58,15 +61,25 @@ public class Manager : MonoBehaviour {
             Mat matThresolded = new Mat(webcamFrame.Width, webcamFrame.Height, DepthType.Cv8U, 1);
             CvInvoke.CvtColor(webcamFrame, matGrayscale, ColorConversion.Bgr2Gray);
 
-            CvInvoke.AdaptiveThreshold(matGrayscale, matThresolded, 255, AdaptiveThresholdType.MeanC, ThresholdType.BinaryInv, 15, 20);
-            CvInvoke.Threshold(matGrayscale, matThresolded, 127, 255 ,ThresholdType.Binary);
+            CvInvoke.Threshold(matGrayscale, matThresolded, thresholdValue, 255 ,ThresholdType.Binary);
 
+
+            VectorOfVectorOfPoint contours = new VectorOfVectorOfPoint();
+            Mat hierarchy = new Mat();
+            CvInvoke.FindContours(matThresolded, contours, hierarchy, RetrType.List, ChainApproxMethod.ChainApproxNone);
             CvInvoke.CvtColor(matThresolded, webcamFrame, ColorConversion.Gray2Bgr);
 
-            //webcamFrame = matThresolded;
+            for (int i = 0; i < contours.Size; i++) {
+                CvInvoke.DrawContours(webcamFrame, contours, i, new MCvScalar(255, 0, 255), 2);
+            }
+
         }
         // making the thread sleep so that things are not happening too fast. might be optional.
-        System.Threading.Thread.Sleep(50);
+        System.Threading.Thread.Sleep(200);
+    }
+
+    public void ChangeThreshold(Slider slider) {
+        thresholdValue = 255 * slider.value;
     }
 
     private void DisplayFrameOnPlane() {
@@ -92,6 +105,7 @@ public class Manager : MonoBehaviour {
         CvInvoke.CvtColor(webcamFrame, webcamFrame, ColorConversion.Bgr2Rgba);
         // Flipping because unity texture is inverted.
         CvInvoke.Flip(webcamFrame, webcamFrame, FlipType.Vertical);
+        CvInvoke.Flip(webcamFrame, webcamFrame, FlipType.Horizontal);
 
         // loading texture in texture object
         tex.LoadRawTextureData(webcamFrame.ToImage<Rgba, byte>().Bytes);
