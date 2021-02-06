@@ -20,7 +20,8 @@ public class Manager : MonoBehaviour {
     private RawImage rawImage;
     private Texture2D tex;
 
-    private float thresholdValue = 127;
+    private float thresholdValue_param1 = 1;
+    private int thresholdValue_blockSize = 25;
 
     void Start() {
         if (rawImage == null)
@@ -86,7 +87,7 @@ public class Manager : MonoBehaviour {
         if (draw) {
             foreach (RotatedRect box in boxList) {
                 CvInvoke.Polylines(webcamFrame, System.Array.ConvertAll(box.GetVertices(), Point.Round), true,
-                    new Bgr(Color.Blue).MCvScalar, 4);
+                    new Bgr(Color.DeepPink).MCvScalar, 4);
             }
         }
         return boxList;
@@ -103,17 +104,31 @@ public class Manager : MonoBehaviour {
             Mat matThresolded = new Mat(webcamFrame.Width, webcamFrame.Height, DepthType.Cv8U, 1);
             CvInvoke.CvtColor(webcamFrame, matGrayscale, ColorConversion.Bgr2Gray);
 
-            CvInvoke.Threshold(matGrayscale, matThresolded, thresholdValue, 255 ,ThresholdType.Binary);
+            Debug.Log(thresholdValue_blockSize);
+
+            //CvInvoke.AdaptiveThreshold(matGrayscale, matThresolded, 255, AdaptiveThresholdType.MeanC, ThresholdType.BinaryInv, thresholdValue_blockSize, thresholdValue_param1);
+            //CvInvoke.Threshold(matGrayscale, matThresolded, thresholdValue_param1, 255 ,ThresholdType.Binary);
+            CvInvoke.Threshold(matGrayscale, matThresolded, 100, 255 ,ThresholdType.Binary);
+
+
+            CvInvoke.CvtColor(matThresolded, webcamFrame, ColorConversion.Gray2Bgr);
 
             List<RotatedRect> boxList = RectangleDetection(matThresolded);
 
+            if (boxList.Count == 4) {
+                
+            }
         }
         // making the thread sleep so that things are not happening too fast. might be optional.
         System.Threading.Thread.Sleep(200);
     }
 
-    public void ChangeThreshold(Slider slider) {
-        thresholdValue = 255 * slider.value;
+    
+    public void ChangeThreshold_blockSize(Slider slider) {
+        thresholdValue_blockSize = 3 + (int)(126 * slider.value) * 2;
+    }
+    public void ChangeThreshold_param1(Slider slider) {
+        thresholdValue_param1 = 255 * 2 * slider.value - 255;
     }
 
     private void DisplayFrameOnPlane() {
