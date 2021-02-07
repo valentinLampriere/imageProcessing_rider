@@ -31,6 +31,8 @@ public class Manager : MonoBehaviour {
 
     private List<Vector2> terrain;
 
+    private bool isRunning = true;
+
     void Start() {
         if (rawImage == null)
             return;
@@ -45,7 +47,7 @@ public class Manager : MonoBehaviour {
     }
 
     void Update() {
-        if (webcam.IsOpened) {
+        if (webcam.IsOpened && isRunning) {
             bool grabbed = webcam.Grab();
 
             if (!grabbed) {
@@ -289,8 +291,10 @@ public class Manager : MonoBehaviour {
 
     public void CreateTerrain() {
 
+        if (area == null) return;
+
         Debug.Log("CreateTerrain");
-        Debug.Log(area.X + ", " + area.X + area.Width);
+        Debug.Log(area.X + ", " + (area.X + area.Width));
         Debug.Log(area.Y + ", " + area.Height);
         terrain = new List<Vector2>();
         if (line != null) {
@@ -304,6 +308,8 @@ public class Manager : MonoBehaviour {
                 }
             }
         }
+
+        isRunning = false;
 
         /*Debug.Log(area.X + ", " + area.Y);
         Debug.Log(line[0][0].X + ", " + line[0][0].Y);
@@ -323,6 +329,7 @@ public class Manager : MonoBehaviour {
             lr.positionCount++;
             lr.SetPosition(lr.positionCount - 1, terrain[i]);
         }*/
+
     }
 
     public List<Vector2> GetTerrain() {
