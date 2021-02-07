@@ -110,4 +110,13 @@ public class Manager : MonoBehaviour {
             webcam.Dispose();
         }
     }
+
+    public Mat GetCurrentImage()
+    {
+        Mat tempImg = new Mat();
+
+        webcam.Retrieve(tempImg);
+
+        return tempImg;
+    }
 }
