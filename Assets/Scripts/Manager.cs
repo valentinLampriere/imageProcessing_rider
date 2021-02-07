@@ -132,19 +132,24 @@ public class Manager : MonoBehaviour {
         PointF p3 = boxList[2].GetVertices()[0];
         PointF p4 = boxList[3].GetVertices()[0];
 
-        float epsilon = 0.1f;
+        float epsilon = 0.2f;
 
         float minX = Mathf.Min(p1.X, p2.X);
+        minX = Mathf.Min(p3.X, minX);
+        minX = Mathf.Min(p4.X, minX);
         float minY = Mathf.Min(p1.Y, p2.Y);
-        float maxX = Mathf.Max(p2.X, p4.X);
-        float maxY = Mathf.Max(p3.Y, p4.Y);
+        minY = Mathf.Min(p3.Y, minY);
+        minY = Mathf.Min(p4.Y, minY);
+        float maxX = Mathf.Max(p1.X, p2.X);
+        maxX = Mathf.Max(p3.X, maxX);
+        maxX = Mathf.Max(p4.X, maxX);
+        float maxY = Mathf.Max(p1.Y, p2.Y);
+        maxY = Mathf.Max(p3.Y, maxY);
+        maxY = Mathf.Max(p4.Y, maxY);
 
         float width = maxX - minX;
         float height = maxY - minY;
-
-        Debug.Log("minX : " + minX + ", maxX : " + maxX );
-        Debug.Log("minY : " + minY + ", maxY : " + maxY);
-        area = new RectangleF(minX + width * epsilon, minY + height * epsilon, (maxX - minX) - width * epsilon, (maxY - minY) - height * epsilon);
+        area = new RectangleF(minX + width * epsilon, minY + height * epsilon, width - width * epsilon, height - height * epsilon);
 
         /*area = new Rectangle2D(
             new Vector2(p1.X, p1.Y),
@@ -285,19 +290,23 @@ public class Manager : MonoBehaviour {
     public void CreateTerrain() {
 
         Debug.Log("CreateTerrain");
-
+        Debug.Log(area.X + ", " + area.X + area.Width);
+        Debug.Log(area.Y + ", " + area.Height);
         terrain = new List<Vector2>();
         if (line != null) {
             for (int i = 0; i < line.Size; i++) {
                 for (int j = 0; j < line[i].Size; j++) {
-                    //if (area.Contains(new Point(line[i][j].X, line[i][j].Y)))
-                    if (line[i][j].X < area.Top && line[i][j].X > area.Bottom) {
-                        if (line[i][j].Y < area.Right && line[i][j].Y > area.Left)
-                            terrain.Add(new Vector2(line[i][j].X, line[i][j].Y));
-                    }
+                    if (area.Contains(new Point(line[i][j].X, line[i][j].Y)))
+                    //if (line[i][j].X > area.X && line[i][j].X < area.X + area.Width &&
+                    //    line[i][j].Y > area.Y && line[i][j].Y < area.Y + area.Height) {
+                        terrain.Add(new Vector2(line[i][j].X, line[i][j].Y));
+                    
                 }
             }
         }
+
+        /*Debug.Log(area.X + ", " + area.Y);
+        Debug.Log(line[0][0].X + ", " + line[0][0].Y);
 
 
         LineRenderer arealr = transform.GetChild(0).GetComponent<LineRenderer>();
@@ -313,7 +322,7 @@ public class Manager : MonoBehaviour {
         for (int i = 0; i < terrain.Count; i++) {
             lr.positionCount++;
             lr.SetPosition(lr.positionCount - 1, terrain[i]);
-        }
+        }*/
     }
 
     public List<Vector2> GetTerrain() {
