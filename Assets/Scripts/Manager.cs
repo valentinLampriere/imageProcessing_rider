@@ -336,4 +336,13 @@ public class Manager : MonoBehaviour {
     public RectangleF GetArea() {
         return area;
     }
+
+    public Mat GetCurrentImage()
+    {
+        Mat tempImg = new Mat();
+
+        webcam.Retrieve(tempImg);
+
+        return tempImg;
+    }
 }
