@@ -13,8 +13,8 @@ using Color = System.Drawing.Color;
 
 public class Manager : MonoBehaviour {
 
-    // Webcam
-    private Emgu.CV.VideoCapture webcam;
+    [SerializeField] private LevelManager lm;
+
     private Mat webcamFrame;
 
     [SerializeField]
@@ -37,30 +37,25 @@ public class Manager : MonoBehaviour {
         if (rawImage == null)
             return;
 
-        webcam = new Emgu.CV.VideoCapture(0, VideoCapture.API.DShow);
-        webcamFrame = new Mat();
-
-
-        webcam.ImageGrabbed += new System.EventHandler(HandleWebcamQueryFrame);
-        // Demarage de la webcam
-        webcam.Start();
+        webcamFrame = CvInvoke.Imread("D:\\Images\\test.png", ImreadModes.AnyColor);
+        DisplayFrameOnPlane();
+        HandleWebcamQueryFrame();
     }
 
     void Update() {
-        if (webcam.IsOpened && isRunning) {
-            bool grabbed = webcam.Grab();
+        //if (webcam.IsOpened && isRunning) {
+        //    bool grabbed = webcam.Grab();
 
-            if (!grabbed) {
-                Debug.Log("no more grab");
-            #if UNITY_EDITOR
-                UnityEditor.EditorApplication.isPlaying = false;
-            #else
-                Application.Quit();
-            #endif
-                return;
-            }
-            DisplayFrameOnPlane();
-        }
+        //    if (!grabbed) {
+        //        Debug.Log("no more grab");
+        //    #if UNITY_EDITOR
+        //        UnityEditor.EditorApplication.isPlaying = false;
+        //    #else
+        //        Application.Quit();
+        //    #endif
+        //        return;
+        //    }
+        //}
     }
     private VectorOfVectorOfPoint LineDetection(Mat matThresolded, bool draw = true) {
         VectorOfVectorOfPoint contours = new VectorOfVectorOfPoint();
@@ -127,6 +122,7 @@ public class Manager : MonoBehaviour {
 
 
     private bool SetArea(List<RotatedRect> boxList) {
+        Debug.Log(boxList.Count);
         if (boxList.Count != 4) return false;
 
         PointF p1 = boxList[0].GetVertices()[2];
@@ -164,10 +160,10 @@ public class Manager : MonoBehaviour {
         return true;
     }
 
-    private void HandleWebcamQueryFrame(object sender, System.EventArgs e) {
-        if (webcam.IsOpened) {
-            webcam.Retrieve(webcamFrame);
-        }
+    private void HandleWebcamQueryFrame() {
+        //if (webcam.IsOpened) {
+        //    webcam.Retrieve(webcamFrame);
+        //}
 
         // we access data, to not cause double access, use locks !
         lock (webcamFrame) {
@@ -188,12 +184,12 @@ public class Manager : MonoBehaviour {
             /*Image<Gray, byte> webcamImg = matThresolded.ToImage<Gray, byte>();
             webcamImg._SmoothGaussian(3);*/
 
-            CvInvoke.CvtColor(matThresolded, webcamFrame, ColorConversion.Gray2Bgr);
+            //CvInvoke.CvtColor(matThresolded, webcamFrame, ColorConversion.Gray2Bgr);
 
             
 
             List<RotatedRect> boxList = RectangleDetection(matThresolded);
-
+            Debug.Log(SetArea(boxList));
             if (SetArea(boxList)) {
 
 
@@ -279,15 +275,15 @@ public class Manager : MonoBehaviour {
         rawImage.texture = tex;
     }
 
-    void OnDestroy() {
-        if (webcam != null) {
-            //waiting for thread to finish before disposing the camera...(took a while to figure out)
-            System.Threading.Thread.Sleep(50);
-            // close camera
-            webcam.Stop();
-            webcam.Dispose();
-        }
-    }
+    //void OnDestroy() {
+    //    if (webcam != null) {
+    //        //waiting for thread to finish before disposing the camera...(took a while to figure out)
+    //        System.Threading.Thread.Sleep(50);
+    //        // close camera
+    //        webcam.Stop();
+    //        webcam.Dispose();
+    //    }
+    //}
 
     public void CreateTerrain() {
 
@@ -309,9 +305,10 @@ public class Manager : MonoBehaviour {
             }
         }
 
+        lm.SetTerrain(terrain);
         isRunning = false;
 
-        /*Debug.Log(area.X + ", " + area.Y);
+        Debug.Log(area.X + ", " + area.Y);
         Debug.Log(line[0][0].X + ", " + line[0][0].Y);
 
 
@@ -325,10 +322,11 @@ public class Manager : MonoBehaviour {
 
         LineRenderer lr = GetComponent<LineRenderer>();
 
-        for (int i = 0; i < terrain.Count; i++) {
+        for (int i = 0; i < terrain.Count; i++)
+        {
             lr.positionCount++;
             lr.SetPosition(lr.positionCount - 1, terrain[i]);
-        }*/
+        }
 
     }
 

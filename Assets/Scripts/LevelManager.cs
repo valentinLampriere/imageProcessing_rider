@@ -7,27 +7,35 @@ public class LevelManager : MonoBehaviour
     [SerializeField] private GameObject cubePrefab;
     [SerializeField] private GameObject obstaclePrefab;
     [SerializeField] private Material[] cubesMat; // 0 blue 1 red
+    [SerializeField] private Manager manager;
+
+    private List<Vector2> points;
+
+    void Awake()
+    {
+        points = new List<Vector2>();
+    }
 
     // Start is called before the first frame update
     void Start()
     {
-        List<Vector2> points = new List<Vector2>();
-        float x = -10f;
-        float y = 0f;
+        //List<Vector2> points = new List<Vector2>();
+        //float x = -10f;
+        //float y = 0f;
 
-        for (int i = 0; i < 100; i++)
-        {
-            x += Random.Range(1.0f, 3.0f);
-            y += Random.Range(-2.0f, 2.0f);
-            points.Add(new Vector2(x, y));
-        }
+        //for (int i = 0; i < 100; i++)
+        //{
+        //    x += Random.Range(1.0f, 3.0f);
+        //    y += Random.Range(-2.0f, 2.0f);
+        //    points.Add(new Vector2(x, y));
+        //}
 
-        //points.Add(new Vector2(2, 2));
-        //points.Add(new Vector2(10, 5));
+        ////points.Add(new Vector2(2, 2));
+        ////points.Add(new Vector2(10, 5));
 
-        CreateLine(points);
+        //CreateLine(points);
 
-        CreateRectangleCube(new Vector2(0, 3), new Vector2(2, 0), new Vector2(5, 5), new Vector2(7, 2), Color.red);
+        //CreateRectangleCube(new Vector2(0, 3), new Vector2(2, 0), new Vector2(5, 5), new Vector2(7, 2), Color.red);
     }
 
     // Update is called once per frame
@@ -86,5 +94,12 @@ public class LevelManager : MonoBehaviour
         cube.transform.localScale = new Vector3(scale + (Mathf.Abs(rotate) * 0.001f), 0.06f, 1);
 
         return cube;
+    }
+
+    public void SetTerrain(List<Vector2> _points)
+    {
+        points = _points;
+
+        CreateLine(points);
     }
 }
