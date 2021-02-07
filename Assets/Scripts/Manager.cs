@@ -337,12 +337,12 @@ public class Manager : MonoBehaviour {
         return area;
     }
 
-    public Mat GetCurrentImage()
-    {
-        Mat tempImg = new Mat();
+    //public Mat GetCurrentImage()
+    //{
+    //    Mat tempImg = new Mat();
 
-        webcam.Retrieve(tempImg);
+    //    webcam.Retrieve(tempImg);
 
-        return tempImg;
-    }
+    //    return tempImg;
+    //}
 }

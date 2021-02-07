@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using UnityEngine;
+using Color = UnityEngine.Color;
 
 public class LevelManager : MonoBehaviour
 {
@@ -8,32 +10,33 @@ public class LevelManager : MonoBehaviour
     [SerializeField] private GameObject obstaclePrefab;
     [SerializeField] private Material[] cubesMat; // 0 blue 1 red
     [SerializeField] private Manager manager;
+    [SerializeField] private ColorDetection cd;
 
     private List<Vector2> points;
 
-    void Awake()
-    {
-        points = new List<Vector2>();
-    }
+    //void Awake()
+    //{
+    //    points = new List<Vector2>();
+    //}
 
     // Start is called before the first frame update
     void Start()
     {
-        //List<Vector2> points = new List<Vector2>();
-        //float x = -10f;
-        //float y = 0f;
+        List<Vector2> points = new List<Vector2>();
+        float x = -10f;
+        float y = 0f;
 
-        //for (int i = 0; i < 100; i++)
-        //{
-        //    x += Random.Range(1.0f, 3.0f);
-        //    y += Random.Range(-2.0f, 2.0f);
-        //    points.Add(new Vector2(x, y));
-        //}
+        for (int i = 0; i < 100; i++)
+        {
+            x += Random.Range(1.0f, 3.0f);
+            y += Random.Range(-2.0f, 2.0f);
+            points.Add(new Vector2(x, y));
+        }
 
-        ////points.Add(new Vector2(2, 2));
-        ////points.Add(new Vector2(10, 5));
+        //points.Add(new Vector2(2, 2));
+        //points.Add(new Vector2(10, 5));
 
-        //CreateLine(points);
+        CreateLine(points);
 
         //CreateRectangleCube(new Vector2(0, 3), new Vector2(2, 0), new Vector2(5, 5), new Vector2(7, 2), Color.red);
     }
@@ -101,5 +104,21 @@ public class LevelManager : MonoBehaviour
         points = _points;
 
         CreateLine(points);
+    }
+
+    public void CreateRectangles()
+    {
+        List<List<PointF>> blueRectangles = cd.GetBlueRectangles();
+        Debug.Log(blueRectangles.Count);
+
+        foreach (List<PointF> listPointF in blueRectangles)
+        {
+            Vector2 p1 = new Vector2(listPointF[0].X, listPointF[0].Y);
+            Vector2 p2 = new Vector2(listPointF[1].X, listPointF[1].Y);
+            Vector2 p3 = new Vector2(listPointF[2].X, listPointF[2].Y);
+            Vector2 p4 = new Vector2(listPointF[3].X, listPointF[3].Y);
+            CreateRectangleCube(p1, p4, p2, p3, UnityEngine.Color.blue);
+        }
+        cd.GetRedRectangles();
     }
 }

@@ -19,6 +19,7 @@ public class ColorDetection : MonoBehaviour
     private List<RotatedRect> BlueRects;
 
     public Manager manager;
+    public LevelManager lm;
 
     private void Start()
     {
@@ -28,6 +29,7 @@ public class ColorDetection : MonoBehaviour
         BlueRects = new List<RotatedRect>();
 
         ShowRectangles();
+        lm.CreateRectangles();
     }
 
     private void ShowRectangles()
