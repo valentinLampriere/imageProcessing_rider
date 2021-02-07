@@ -18,12 +18,48 @@ public class ColorDetection : MonoBehaviour
     private List<RotatedRect> RedRects;
     private List<RotatedRect> BlueRects;
 
-    public Manager manager;
+    public List<List<PointF>> GetRedRectangles()
+    {
+        List<List<PointF>> rects = new List<List<PointF>>();
+
+        foreach (RotatedRect rect in RedRects)
+        {
+            List<PointF> rectVerts = new List<PointF>();
+
+            foreach (PointF point in rect.GetVertices())
+            {
+                rectVerts.Add(point);
+            }
+
+            rects.Add(rectVerts);
+        }
+
+        return rects;
+    }
+
+    public List<List<PointF>> GetBlueRectangles()
+    {
+        List<List<PointF>> rects = new List<List<PointF>>();
+
+        foreach (RotatedRect rect in BlueRects)
+        {
+            List<PointF> rectVerts = new List<PointF>();
+
+            foreach (PointF point in rect.GetVertices())
+            {
+                rectVerts.Add(point);
+            }
+
+            rects.Add(rectVerts);
+        }
+
+        return rects;
+    }
 
     private void Start()
     {
         l = 0;
-        input = CvInvoke.Imread($"{Application.dataPath}/sample5.png", ImreadModes.AnyColor);
+        input = CvInvoke.Imread($"{Application.dataPath}/sample6.png", ImreadModes.AnyColor);
         RedRects = new List<RotatedRect>();
         BlueRects = new List<RotatedRect>();
 
@@ -63,6 +99,11 @@ public class ColorDetection : MonoBehaviour
 
         CvInvoke.CvtColor(img, gray, ColorConversion.Bgr2Gray);
         CvInvoke.GaussianBlur(gray, gray, new Size(3, 3), 1);
+
+        if (debugString != null)
+        {
+            CvInvoke.Imshow($"Debug {debugString}", gray.ToImage<Bgr, byte>());
+        }
 
         CvInvoke.Canny(gray, cannyEdges, cannyThreshold, cannyThresholdLinking);
 
@@ -124,11 +165,13 @@ public class ColorDetection : MonoBehaviour
         Mat rectangleImage = new Mat(imgSize, DepthType.Cv8U, 3);
 
         rectangleImage.SetTo(new MCvScalar(0));
-        int boxcount = 0;
+        //int boxcount = 0;
         foreach (RotatedRect box in boxList)
         {
             CvInvoke.Polylines(rectangleImage, Array.ConvertAll(box.GetVertices(), Point.Round), true,
                 new Bgr(System.Drawing.Color.DarkOrange).MCvScalar);
+            
+            //CvInvoke.Imshow($"Box {boxcount++}", rectangleImage.ToImage<Bgr, byte>());
         }
 
         return rectangleImage;
@@ -194,44 +237,6 @@ public class ColorDetection : MonoBehaviour
             CvInvoke.Imshow($"Blue {l}", image);
 
         return mask;
-    }
-
-    public List<List<PointF>> GetRedRectangles()
-    {
-        List<List<PointF>> rects = new List<List<PointF>>();
-
-        foreach (RotatedRect rect in RedRects)
-        {
-            List<PointF> rectVerts = new List<PointF>();
-            
-            foreach(PointF point in rect.GetVertices())
-            {
-                rectVerts.Add(point);
-            }
-
-            rects.Add(rectVerts);
-        }
-
-        return rects;
-    }
-
-    public List<List<PointF>> GetBlueRectangles()
-    {
-        List<List<PointF>> rects = new List<List<PointF>>();
-
-        foreach (RotatedRect rect in BlueRects)
-        {
-            List<PointF> rectVerts = new List<PointF>();
-
-            foreach (PointF point in rect.GetVertices())
-            {
-                rectVerts.Add(point);
-            }
-
-            rects.Add(rectVerts);
-        }
-
-        return rects;
     }
 
     //Unity Editor debug functions
