@@ -37,7 +37,7 @@ public class Manager : MonoBehaviour {
         if (rawImage == null)
             return;
 
-        webcamFrame = CvInvoke.Imread("D:\\Images\\test.png", ImreadModes.AnyColor);
+        webcamFrame = CvInvoke.Imread($"{Application.dataPath}/test.png", ImreadModes.AnyColor);
         DisplayFrameOnPlane();
         HandleWebcamQueryFrame();
     }
