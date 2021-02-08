@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Drawing;
 using UnityEngine;
 using Color = UnityEngine.Color;
@@ -26,10 +25,10 @@ public class LevelManager : MonoBehaviour
         float x = 0f;
         float y = 280f;
 
-        for (int i = 0; i < 100; i++)
+        for (int i = 0; i < 75; i++)
         {
             x += Random.Range(10.0f, 20.0f);
-            y += Random.Range(-20.0f, 20.0f);
+            y += Random.Range(-10.0f, 10.0f);
             points.Add(new Vector2(x, y));
         }
 
@@ -94,7 +93,7 @@ public class LevelManager : MonoBehaviour
         float rotate = Mathf.Rad2Deg * Mathf.Atan2(_p2.y - _p1.y, _p2.x - _p1.x);
 
         GameObject cube = Instantiate(objectType, pos, Quaternion.Euler(0, 0, rotate));
-        cube.transform.localScale = new Vector3(scale + (Mathf.Abs(rotate) * 0.001f), 0.06f, 1);
+        cube.transform.localScale = new Vector3(scale + (Mathf.Abs(rotate) * 0.001f), 1f, 10f);
 
         return cube;
     }

@@ -10,6 +10,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float slipperyForce;
     [SerializeField] private float airControl;
     [SerializeField] private float maxVelocity;
+    [SerializeField] private float fallingForce;
     [SerializeField] private Material[] materials; // 0 blue 1 red;
 
     public static float currentHealth;
@@ -50,6 +51,7 @@ public class PlayerController : MonoBehaviour
         else
         {
             AddForceOnMovement(airControl);
+            AddFallingForce();
         }
 
         ClampVelocity();
@@ -59,6 +61,11 @@ public class PlayerController : MonoBehaviour
     {
         Vector3 forceToAdd = ((0.75f * transform.right) + (0.25f * Vector3.right)) * movement * speed * f;
         rb.AddForce(forceToAdd);
+    }
+
+    void AddFallingForce()
+    {
+        rb.AddForce(Vector3.down * fallingForce);
     }
 
     void AddForceOnGround()
