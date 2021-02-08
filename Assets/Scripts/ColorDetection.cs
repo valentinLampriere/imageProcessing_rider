@@ -61,7 +61,7 @@ public class ColorDetection : MonoBehaviour
     private void Start()
     {
         l = 0;
-        input = CvInvoke.Imread($"{Application.dataPath}/sample6.png", ImreadModes.AnyColor);
+        input = CvInvoke.Imread($"{Application.dataPath}/test.png", ImreadModes.AnyColor);
         RedRects = new List<RotatedRect>();
         BlueRects = new List<RotatedRect>();
 

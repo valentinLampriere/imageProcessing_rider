@@ -23,13 +23,13 @@ public class LevelManager : MonoBehaviour
     void Start()
     {
         List<Vector2> points = new List<Vector2>();
-        float x = -10f;
-        float y = 0f;
+        float x = 0f;
+        float y = 280f;
 
         for (int i = 0; i < 100; i++)
         {
-            x += Random.Range(1.0f, 3.0f);
-            y += Random.Range(-2.0f, 2.0f);
+            x += Random.Range(10.0f, 20.0f);
+            y += Random.Range(-20.0f, 20.0f);
             points.Add(new Vector2(x, y));
         }
 
@@ -119,6 +119,17 @@ public class LevelManager : MonoBehaviour
             Vector2 p4 = new Vector2(listPointF[3].X, listPointF[3].Y);
             CreateRectangleCube(p1, p4, p2, p3, UnityEngine.Color.blue);
         }
-        cd.GetRedRectangles();
+
+        List<List<PointF>> redRectangles = cd.GetRedRectangles();
+        Debug.Log(blueRectangles.Count);
+
+        foreach (List<PointF> listPointF in redRectangles)
+        {
+            Vector2 p1 = new Vector2(listPointF[0].X, listPointF[0].Y);
+            Vector2 p2 = new Vector2(listPointF[1].X, listPointF[1].Y);
+            Vector2 p3 = new Vector2(listPointF[2].X, listPointF[2].Y);
+            Vector2 p4 = new Vector2(listPointF[3].X, listPointF[3].Y);
+            CreateRectangleCube(p1, p4, p2, p3, UnityEngine.Color.red);
+        }
     }
 }
